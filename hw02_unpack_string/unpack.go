@@ -17,16 +17,22 @@ func Unpack(textForUnpack string) (string, error) {
 	for i, currentRune := range textForUnpack {
 		prevRuneIsDigit := unicode.IsDigit(prevRune)
 		currentRuneIsDigit := unicode.IsDigit(currentRune)
+		isLastRune := i == length-1
+
+		if prevRune == 0 && currentRuneIsDigit {
+			return "", ErrInvalidString
+		}
 
 		if prevRuneIsDigit && currentRuneIsDigit {
 			return "", ErrInvalidString
 		}
 
 		if !prevRuneIsDigit && !currentRuneIsDigit {
-			resultStringBuilder.WriteRune(prevRune)
+			if prevRune != 0 {
+				resultStringBuilder.WriteRune(prevRune)
+			}
 			prevRune = currentRune
 
-			isLastRune := i == length-1
 			if isLastRune {
 				resultStringBuilder.WriteRune(currentRune)
 			}
@@ -42,7 +48,6 @@ func Unpack(textForUnpack string) (string, error) {
 		}
 
 		prevRune = currentRune
-		isLastRune := i == length-1
 		if isLastRune {
 			resultStringBuilder.WriteRune(currentRune)
 		}
