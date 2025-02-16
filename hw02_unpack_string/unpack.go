@@ -42,7 +42,6 @@ func Unpack(textForUnpack string) (string, error) {
 		}
 
 		prevRune = currentRune
-
 		isLastRune := i == length-1
 		if isLastRune {
 			resultStringBuilder.WriteRune(currentRune)
