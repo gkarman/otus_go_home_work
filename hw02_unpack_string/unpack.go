@@ -53,7 +53,6 @@ func isValidString(index int, prevRune rune, currentRune rune) bool {
 }
 
 func getCountPreviousRepeats(prevRune rune, currentRune rune) (int, error) {
-
 	if prevRune == '\x00' {
 		return 0, nil
 	}
