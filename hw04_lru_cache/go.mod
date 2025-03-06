@@ -1,6 +1,6 @@
-module github.com/fixme_my_friend/hw04_lru_cache
+module github.com/gkarman/otus_go_home_work/hw04_lru_cache
 
-go 1.22
+go 1.23.5
 
 require github.com/stretchr/testify v1.7.0
 
