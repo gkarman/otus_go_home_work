@@ -40,6 +40,7 @@ func (c *lruCache) Set(key Key, value interface{}) bool {
 func (c *lruCache) Get(key Key) (interface{}, bool) {
 	v, isExists := c.items[key]
 	if isExists {
+		c.queue.MoveToFront(v)
 		return v.Value, true
 	}
 

@@ -85,13 +85,25 @@ func (l *list) MoveToFront(moveItem *ListItem) {
 	}
 
 	if moveItem == l.lastItem {
-		l.removeLastItemInList()
-		l.PushFront(moveItem.Value)
+		preLastItem := l.lastItem.Prev
+		preLastItem.Next = nil
+		l.lastItem = preLastItem
+
+		moveItem.Prev = nil
+		moveItem.Next = l.firstItem
+
+		l.firstItem = moveItem
+		l.firstItem.Next.Prev = moveItem
 		return
 	}
+	moveItem.Prev.Next = moveItem.Next
+	moveItem.Next.Prev = moveItem.Prev
 
-	l.removeMiddleItemInList(moveItem)
-	l.PushFront(moveItem.Value)
+	moveItem.Prev = nil
+	moveItem.Next = l.firstItem
+
+	l.firstItem = moveItem
+	l.firstItem.Next.Prev = moveItem
 }
 
 func (l *list) clearList() {
