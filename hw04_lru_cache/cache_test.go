@@ -49,8 +49,46 @@ func TestCache(t *testing.T) {
 		require.Nil(t, val)
 	})
 
-	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+	t.Run("deleting the last item from the cache", func(t *testing.T) {
+		cache := NewCache(3)
+
+		cache.Set("a", 1)
+		cache.Set("b", 2)
+		cache.Set("c", 3)
+		cache.Set("d", 4)
+
+		val, ok := cache.Get("a")
+		require.False(t, ok)
+		require.Nil(t, val)
+
+		val, ok = cache.Get("b")
+		require.True(t, ok)
+		require.Equal(t, 2, val)
+
+		val, ok = cache.Get("c")
+		require.True(t, ok)
+		require.Equal(t, 3, val)
+
+		val, ok = cache.Get("d")
+		require.True(t, ok)
+		require.Equal(t, 4, val)
+	})
+
+	t.Run("deleting the last one used", func(t *testing.T) {
+		cache := NewCache(3)
+
+		cache.Set("a", 1)
+		cache.Set("b", 2)
+		cache.Set("c", 3)
+
+		cache.Get("a")
+		cache.Get("b")
+
+		cache.Set("d", 4)
+
+		val, ok := cache.Get("c")
+		require.False(t, ok)
+		require.Nil(t, val)
 	})
 }
 
