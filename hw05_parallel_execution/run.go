@@ -10,6 +10,7 @@ var ErrErrorsLimitExceeded = errors.New("errors limit exceeded")
 type Task func() error
 
 func Run(tasks []Task, n, m int) error {
+	successRunCh := make(chan bool)
 	tasksCh := make(chan Task, len(tasks))
 	for _, task := range tasks {
 		tasksCh <- task
@@ -18,24 +19,26 @@ func Run(tasks []Task, n, m int) error {
 
 	tasksResultCh := make(chan error)
 	stopWorkerFlagCh := make(chan struct{})
-	var once sync.Once
 	go func() {
-		taskResultMonitor(tasksResultCh, stopWorkerFlagCh, m, &once)
+		taskResultMonitor(tasksResultCh, stopWorkerFlagCh, successRunCh, m)
 	}()
 
 	var wg sync.WaitGroup
 	for i := 0; i < n; i++ {
 		wg.Add(1)
 		go func() {
-			defer func() {
-				println("goroutine stopped")
-				wg.Done()
-			}()
+			defer wg.Done()
 			worker(tasksCh, tasksResultCh, stopWorkerFlagCh)
 		}()
 	}
 	wg.Wait()
 	close(tasksResultCh)
+
+	success := <-successRunCh
+	close(successRunCh)
+	if !success {
+		return ErrErrorsLimitExceeded
+	}
 	return nil
 }
 
@@ -48,20 +51,31 @@ func worker(tasksCh <-chan Task, tasksResultCh chan<- error, stopWorkerFlagCh <-
 			if !ok {
 				return
 			}
-			result := task()
-			tasksResultCh <- result
+			select {
+			case <-stopWorkerFlagCh:
+				return
+			default:
+				result := task()
+				tasksResultCh <- result
+			}
 		}
 	}
 }
 
-func taskResultMonitor(tasksResultCh <-chan error, stopWorkerFlagCh chan<- struct{}, maxErrCount int, once *sync.Once) {
-	ErrCount := 0
+func taskResultMonitor(tasksResultCh <-chan error, stopFlagCh chan<- struct{}, successCh chan<- bool, maxErr int) {
+	errCount := 0
+	success := true
 	for result := range tasksResultCh {
-		if result != nil {
-			ErrCount++
+		if maxErr <= 0 {
+			continue
 		}
-		if ErrCount >= maxErrCount {
-			once.Do(func() { close(stopWorkerFlagCh) })
+		if result != nil {
+			errCount++
+		}
+		if errCount == maxErr {
+			close(stopFlagCh)
+			success = false
 		}
 	}
+	successCh <- success
 }
