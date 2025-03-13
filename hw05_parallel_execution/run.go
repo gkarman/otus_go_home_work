@@ -2,7 +2,6 @@ package hw05parallelexecution
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 )
 
@@ -37,12 +36,6 @@ func Run(tasks []Task, n, m int) error {
 	}
 	wg.Wait()
 	close(tasksResultCh)
-
-	//_, ok := <-stopWorkerFlagCh
-	//if !ok {
-	//	return ErrErrorsLimitExceeded
-	//}
-
 	return nil
 }
 
@@ -64,14 +57,11 @@ func worker(tasksCh <-chan Task, tasksResultCh chan<- error, stopWorkerFlagCh <-
 func taskResultMonitor(tasksResultCh <-chan error, stopWorkerFlagCh chan<- struct{}, maxErrCount int, once *sync.Once) {
 	ErrCount := 0
 	for result := range tasksResultCh {
-		fmt.Println(result)
 		if result != nil {
 			ErrCount++
 		}
 		if ErrCount >= maxErrCount {
-			fmt.Println("Закрываем канал")
 			once.Do(func() { close(stopWorkerFlagCh) })
-			return
 		}
 	}
 }
