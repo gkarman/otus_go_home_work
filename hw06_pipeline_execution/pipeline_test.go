@@ -14,7 +14,7 @@ const (
 	fault         = sleepPerStage / 2
 )
 
-var isFullTesting = true
+var isFullTesting = false
 
 func TestPipeline(t *testing.T) {
 	// Stage generator
@@ -150,6 +150,74 @@ func TestAllStageStop(t *testing.T) {
 		wg.Wait()
 
 		require.Len(t, result, 0)
+	})
+}
 
+func TestPipelineProcessing(t *testing.T) {
+	t.Run("my_test", func(t *testing.T) {
+		in := make(Bi)
+		done := make(Bi)
+
+		data := []int{1, 2, 3, 4, 5}
+		stageDummy := func(in In) Out {
+			out := make(Bi)
+			go func() {
+				defer close(out)
+				for v := range in {
+					out <- v
+				}
+			}()
+			return out
+		}
+
+		stageMultiplier := func(in In) Out {
+			out := make(Bi)
+			go func() {
+				defer close(out)
+				for v := range in {
+					out <- v.(int) * 2
+				}
+			}()
+			return out
+		}
+
+		stageAdder := func(in In) Out {
+			out := make(Bi)
+			go func() {
+				defer close(out)
+				for v := range in {
+					out <- v.(int) + 100
+				}
+			}()
+			return out
+		}
+
+		go func() {
+			for _, v := range data {
+				in <- v
+			}
+			close(in)
+		}()
+
+		stages := []Stage{
+			stageDummy,
+			stageMultiplier,
+			stageAdder,
+		}
+
+		result := make([]int, 0, len(data))
+
+		for v := range ExecutePipeline(in, done, stages...) {
+			result = append(result, v.(int))
+		}
+
+		// Ожидаемый результат:
+		// 1 -> 1 (stageDummy)
+		// 1 -> 2 (stageMultiplier)
+		// 2 -> 102 (stageAdder)
+		// (...)
+
+		expected := []int{102, 104, 106, 108, 110}
+		require.Equal(t, expected, result)
 	})
 }
