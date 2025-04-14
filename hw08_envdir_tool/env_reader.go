@@ -18,6 +18,7 @@ type EnvValue struct {
 }
 
 var ErrNoValidNameFile = errors.New("no valid file name")
+
 var ErrEntryIsDir = errors.New("entry is directory")
 
 func ReadDir(dir string) (Environment, error) {
@@ -72,8 +73,11 @@ func getValue(dir string, entry os.DirEntry) (string, error) {
 
 	reader := bufio.NewReader(file)
 	line, err := reader.ReadString('\n')
-	if err != nil && err != io.EOF {
-		return "", fmt.Errorf("read line: %w", err)
+
+	if err != nil && !errors.Is(err, io.EOF) {
+		if errors.Is(err, io.EOF) {
+			return "", fmt.Errorf("read failed: %w", err)
+		}
 	}
 
 	clean := strings.ReplaceAll(line, "\x00", "\n")
