@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"github.com/stretchr/testify/require"
+	"testing"
+)
 
 func TestRunCmd(t *testing.T) {
 	t.Run("check success code", func(t *testing.T) {
@@ -9,9 +12,7 @@ func TestRunCmd(t *testing.T) {
 
 		code := RunCmd(cmd, env)
 
-		if code != 0 {
-			t.Errorf("Expected exit code 0, got %d", code)
-		}
+		require.Equal(t, code, 0)
 	})
 
 	t.Run("check error code", func(t *testing.T) {
@@ -20,9 +21,7 @@ func TestRunCmd(t *testing.T) {
 
 		code := RunCmd(cmd, env)
 
-		if code != 42 {
-			t.Errorf("Expected exit code 42, got %d", code)
-		}
+		require.Equal(t, code, 42)
 	})
 
 }
