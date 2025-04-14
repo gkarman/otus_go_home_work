@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -16,10 +17,13 @@ type EnvValue struct {
 	NeedRemove bool
 }
 
+var ErrNoValidNameFile = errors.New("no valid file name")
+var ErrEntryIsDir = errors.New("entry is directory")
+
 func ReadDir(dir string) (Environment, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		err := fmt.Errorf("Ошибка чтения директории")
+		err := fmt.Errorf("read directory: %w", err)
 		return nil, err
 	}
 
@@ -27,17 +31,17 @@ func ReadDir(dir string) (Environment, error) {
 	for _, entry := range entries {
 		key, err := getKey(entry)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("get key: %w", err)
 		}
 
 		value, err := getValue(dir, entry)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("get value: %w", err)
 		}
 
 		isForRemove, err := isNeedRemove(entry)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("get is_for_remove: %w", err)
 		}
 
 		environment[key] = EnvValue{value, isForRemove}
@@ -48,14 +52,12 @@ func ReadDir(dir string) (Environment, error) {
 
 func getKey(entry os.DirEntry) (string, error) {
 	if entry.IsDir() {
-		err := fmt.Errorf("Директория, нужен файл")
-		return "", err
+		return "", ErrEntryIsDir
 	}
 	fileName := entry.Name()
 	badSymbols := `=`
 	if strings.ContainsAny(fileName, badSymbols) {
-		err := fmt.Errorf("Имя файла не валидно")
-		return "", err
+		return "", ErrNoValidNameFile
 	}
 	return fileName, nil
 }
@@ -64,14 +66,14 @@ func getValue(dir string, entry os.DirEntry) (string, error) {
 	filePath := filepath.Join(dir, entry.Name())
 	file, err := os.Open(filePath)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("open file: %w", err)
 	}
 	defer file.Close()
 
 	reader := bufio.NewReader(file)
 	line, err := reader.ReadString('\n')
 	if err != nil && err != io.EOF {
-		return "", err
+		return "", fmt.Errorf("read line: %w", err)
 	}
 
 	clean := strings.ReplaceAll(line, "\x00", "\n")
@@ -83,7 +85,7 @@ func getValue(dir string, entry os.DirEntry) (string, error) {
 func isNeedRemove(entry os.DirEntry) (bool, error) {
 	fileInfo, err := entry.Info()
 	if err != nil {
-		err := fmt.Errorf("Ошибка чтения инфромации о файле")
+		err := fmt.Errorf("get file info: %w", err)
 		return false, err
 	}
 	if fileInfo.Size() == 0 {
