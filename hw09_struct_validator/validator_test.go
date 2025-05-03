@@ -94,73 +94,76 @@ func TestValidate(t *testing.T) {
 			},
 			ErrValueTooBig,
 		},
-		//{
-		//	User{
-		//		"1",
-		//		"Ivan",
-		//		18,
-		//		"noemail",
-		//		"admin",
-		//		[]string{"79111111111", "79222222222"},
-		//		[]byte{1},
-		//	},
-		//	ErrRegexpString,
-		//},
-		//{
-		//	User{
-		//		"1",
-		//		"Ivan",
-		//		18,
-		//		"ivan@mail.ru",
-		//		"admin11",
-		//		[]string{"79111111111", "79222222222"},
-		//		[]byte{1},
-		//	},
-		//	ErrValueNotInList,
-		//}, {
-		//	User{
-		//		"1",
-		//		"Ivan",
-		//		18,
-		//		"ivan@mail.ru",
-		//		"admin",
-		//		[]string{"79", "79"},
-		//		[]byte{1},
-		//	},
-		//	ErrLenString,
-		//}, {
-		//	App{
-		//		"12345",
-		//	},
-		//	nil,
-		//}, {
-		//	App{
-		//		"1234",
-		//	},
-		//	ErrLenString,
-		//},
-		//{
-		//	Token{
-		//		[]byte{1, 2, 3},
-		//		[]byte{1, 2, 3},
-		//		[]byte{1, 2, 3},
-		//	},
-		//	nil,
-		//},
-		//{
-		//	Response{
-		//		200,
-		//		"somestring",
-		//	},
-		//	nil,
-		//},
-		//{
-		//	Response{
-		//		211,
-		//		"somestring",
-		//	},
-		//	ErrValueNotInList,
-		//},
+		{
+			User{
+				"1",
+				"Ivan",
+				18,
+				"noemail",
+				"admin",
+				[]string{"79111111111", "79222222222"},
+				[]byte{1},
+			},
+			ErrRegexpString,
+		},
+		{
+			User{
+				"1",
+				"Ivan",
+				18,
+				"ivan@mail.ru",
+				"admin11",
+				[]string{"79111111111", "79222222222"},
+				[]byte{1},
+			},
+			ErrValueNotInList,
+		},
+		{
+			User{
+				"1",
+				"Ivan",
+				18,
+				"ivan@mail.ru",
+				"admin",
+				[]string{"79", "79"},
+				[]byte{1},
+			},
+			ErrLenString,
+		},
+		{
+			App{
+				"12345",
+			},
+			nil,
+		},
+		{
+			App{
+				"1234",
+			},
+			ErrLenString,
+		},
+		{
+			Token{
+				[]byte{1, 2, 3},
+				[]byte{1, 2, 3},
+				[]byte{1, 2, 3},
+			},
+			nil,
+		},
+		{
+			Response{
+				200,
+				"somestring",
+			},
+			nil,
+		},
+		{
+			Response{
+				211,
+				"somestring",
+			},
+			ErrValueNotInList,
+		},
 	}
 
 	for i, tt := range tests {

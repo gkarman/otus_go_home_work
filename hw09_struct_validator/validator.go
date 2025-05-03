@@ -98,13 +98,18 @@ func processValidateField(structField reflect.StructField, valueField reflect.Va
 		validateRuleName := validateRuleParts[0]
 		validateRuleValue := validateRuleParts[1]
 
-		functionForValidate, err := getFunctionForValidateByRuleName(validateRuleName)
-		if err != nil {
-			return nil, fmt.Errorf("Тег валидации не поддерживается %w", err)
+		functionForValidate, programError := getFunctionForValidateByRuleName(validateRuleName)
+		if programError != nil {
+			return nil, fmt.Errorf("Тег валидации не поддерживается %w", programError)
 		}
 
 		validationFieldData := ValidationFieldData{structField, valueField, validateRuleValue}
-		return functionForValidate(validationFieldData)
+
+		validationError, programError := functionForValidate(validationFieldData)
+		if programError != nil {
+			return nil, fmt.Errorf("разбор тега %w", programError)
+		}
+		fieldValidationErrors = append(fieldValidationErrors, validationError...)
 
 	}
 	return fieldValidationErrors, nil
@@ -122,7 +127,7 @@ func getFunctionForValidateByRuleName(ruleName string) (ValidateFunc, error) {
 
 	function, ok := validateFunctions[ruleName]
 	if !ok {
-		return nil, fmt.Errorf("<UNK> <UNK> <UNK> %s", ruleName)
+		return nil, ErrInvalidTag
 	}
 
 	return function, nil
