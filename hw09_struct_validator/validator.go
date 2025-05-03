@@ -10,14 +10,16 @@ import (
 	"unicode/utf8"
 )
 
-var ErrMustBeStruct = errors.New("только для структуры")
-var ErrInvalidTag = errors.New("тег невалидный")
-var ErrValidationRuleDoesntSupportTypeField = errors.New("тип не поддерживается")
-var ErrValueTooSmall = errors.New("значение меньше минимального")
-var ErrValueTooBig = errors.New("значение выше максимального")
-var ErrLenString = errors.New("строка не той длинны")
-var ErrRegexpString = errors.New("значение не нужного формата")
-var ErrValueNotInList = errors.New("значение не входит в допустимый список")
+var (
+	ErrMustBeStruct                         = errors.New("только для структуры")
+	ErrInvalidTag                           = errors.New("тег невалидный")
+	ErrValidationRuleDoesntSupportTypeField = errors.New("тип не поддерживается")
+	ErrValueTooSmall                        = errors.New("значение меньше минимального")
+	ErrValueTooBig                          = errors.New("значение выше максимального")
+	ErrLenString                            = errors.New("строка не той длинны")
+	ErrRegexpString                         = errors.New("значение не нужного формата")
+	ErrValueNotInList                       = errors.New("значение не входит в допустимый список")
+)
 
 type ValidationError struct {
 	Field string
@@ -100,7 +102,7 @@ func processValidateField(structField reflect.StructField, valueField reflect.Va
 
 		functionForValidate, programError := getFunctionForValidateByRuleName(validateRuleName)
 		if programError != nil {
-			return nil, fmt.Errorf("Тег валидации не поддерживается %w", programError)
+			return nil, fmt.Errorf("тег валидации не поддерживается %w", programError)
 		}
 
 		validationFieldData := ValidationFieldData{structField, valueField, validateRuleValue}
@@ -110,10 +112,8 @@ func processValidateField(structField reflect.StructField, valueField reflect.Va
 			return nil, fmt.Errorf("разбор тега %w", programError)
 		}
 		fieldValidationErrors = append(fieldValidationErrors, validationError...)
-
 	}
 	return fieldValidationErrors, nil
-
 }
 
 func getFunctionForValidateByRuleName(ruleName string) (ValidateFunc, error) {
@@ -133,6 +133,7 @@ func getFunctionForValidateByRuleName(ruleName string) (ValidateFunc, error) {
 	return function, nil
 }
 
+//nolint:dupl // похожа на другую функцию, но намеренно оставлена
 func processValidateLen(vfd ValidationFieldData) (ValidationErrors, error) {
 	var fieldValidationErrors ValidationErrors
 
@@ -168,6 +169,7 @@ func processValidateLen(vfd ValidationFieldData) (ValidationErrors, error) {
 	return fieldValidationErrors, nil
 }
 
+//nolint:dupl // похожа на другую функцию, но намеренно оставлена
 func processValidateMin(vfd ValidationFieldData) (ValidationErrors, error) {
 	var fieldValidationErrors ValidationErrors
 
@@ -203,6 +205,7 @@ func processValidateMin(vfd ValidationFieldData) (ValidationErrors, error) {
 	return fieldValidationErrors, nil
 }
 
+//nolint:dupl // похожа на другую функцию, но намеренно оставлена
 func processValidateMax(vfd ValidationFieldData) (ValidationErrors, error) {
 	var fieldValidationErrors ValidationErrors
 
@@ -238,6 +241,7 @@ func processValidateMax(vfd ValidationFieldData) (ValidationErrors, error) {
 	return fieldValidationErrors, nil
 }
 
+//nolint:dupl // похожа на другую функцию, но намеренно оставлена
 func processValidateRegexp(vfd ValidationFieldData) (ValidationErrors, error) {
 	var fieldValidationErrors ValidationErrors
 
@@ -273,6 +277,7 @@ func processValidateRegexp(vfd ValidationFieldData) (ValidationErrors, error) {
 	return fieldValidationErrors, nil
 }
 
+//nolint:gocognit // длинная
 func processValidateIn(vfd ValidationFieldData) (ValidationErrors, error) {
 	var fieldValidationErrors ValidationErrors
 	ruleConstraints := strings.Split(vfd.ruleValue, ",")

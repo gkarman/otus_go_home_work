@@ -14,11 +14,11 @@ type (
 	User struct {
 		ID     string `json:"id" validate:"len:1"`
 		Name   string
-		Age    int             `validate:"min:18|max:50"`
-		Email  string          `validate:"regexp:^\\w+@\\w+\\.\\w+$"`
-		Role   UserRole        `validate:"in:admin,stuff"`
-		Phones []string        `validate:"len:11"`
-		meta   json.RawMessage //nolint:unused
+		Age    int      `validate:"min:18|max:50"`
+		Email  string   `validate:"regexp:^\\w+@\\w+\\.\\w+$"`
+		Role   UserRole `validate:"in:admin,stuff"`
+		Phones []string `validate:"len:11"`
+		meta   json.RawMessage
 	}
 
 	App struct {
@@ -37,6 +37,7 @@ type (
 	}
 )
 
+//nolint:funlen,gocognit // функция слишком длинная, но намеренно
 func TestValidate(t *testing.T) {
 	tests := []struct {
 		structForValidate interface{}
@@ -182,7 +183,6 @@ func TestValidate(t *testing.T) {
 			if errors.Is(err, tt.expectedErr) {
 				return
 			}
-
 			if tt.expectedErr == nil && err != nil {
 				t.Errorf("получили ошибку, хотя не должны были %v: ", err)
 			}
@@ -201,7 +201,6 @@ func TestValidate(t *testing.T) {
 				}
 				return
 			}
-
 			t.Errorf("ожидалась ошибка %v, но получено: %v", tt.expectedErr, err)
 		})
 	}
