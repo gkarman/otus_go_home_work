@@ -3,7 +3,6 @@ package hw10programoptimization
 import (
 	"bufio"
 	"fmt"
-	"github.com/mailru/easyjson"
 	"io"
 	"strings"
 )
@@ -28,9 +27,10 @@ func GetDomainStat(r io.Reader, domain string) (DomainStat, error) {
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		line := scanner.Bytes()
-		if err := easyjson.Unmarshal(line, &user); err != nil {
-			return nil, fmt.Errorf("json unmarshal failed: %w", err)
+		if err := user.UnmarshalJSON(line); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal user: %w", err)
 		}
+
 		email := strings.ToLower(user.Email)
 		if strings.HasSuffix(email, domain) {
 			parts := strings.SplitN(email, "@", 2)
