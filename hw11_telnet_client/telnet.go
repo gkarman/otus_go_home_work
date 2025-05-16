@@ -68,6 +68,9 @@ func (cl *OtusTelnetClient) Send() error {
 	if err := scanner.Err(); err != nil {
 		return fmt.Errorf("чтения ввода: %w", err)
 	}
+
+	fmt.Println("Получен EOF (Ctrl+D) — закрытие соединения")
+
 	return nil
 }
 
