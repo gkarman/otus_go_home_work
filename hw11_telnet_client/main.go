@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
 	"os"
+	"os/signal"
 	"sync"
 	"time"
 
@@ -32,18 +34,27 @@ func main() {
 		log.Fatalf("подключение не удалось %v", err)
 	}
 
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		writeRoutine(client)
+		defer closeClient(client)
+		writeRoutine(ctx, client)
 	}()
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		readRoutine(client)
+		defer closeClient(client)
+		readRoutine(ctx, client)
 	}()
+
+	<-ctx.Done()
+	_ = client.Close()
+
 	wg.Wait()
 }
 
@@ -62,17 +73,37 @@ func parseArgs() (args, error) {
 	return args{host, port, timeout}, nil
 }
 
-func writeRoutine(client TelnetClient) {
-	err := client.Send()
-	if err != nil {
-		log.Fatalf("отправка не удалась %v", err)
+func writeRoutine(ctx context.Context, client TelnetClient) {
+	errorCh := make(chan error, 1)
+	go func() {
+		errorCh <- client.Send()
+	}()
+
+	select {
+	case <-ctx.Done():
+		return
+	case err := <-errorCh:
+		if err != nil {
+			return
+		}
 	}
 }
 
-func readRoutine(client TelnetClient) {
-	err := client.Receive()
-	if err != nil {
-		log.Fatalf("получение не удалась %v", err)
+func readRoutine(ctx context.Context, client TelnetClient) {
+	errorCh := make(chan error, 1)
+	go func() {
+		errorCh <- client.Receive()
+	}()
+
+	select {
+	case <-ctx.Done():
+		log.Println("остановка чтения (Ctrl+C)")
+		return
+	case err := <-errorCh:
+		if err != nil {
+			log.Printf("ошибка при получении: %v", err)
+		}
+		return
 	}
 }
 
