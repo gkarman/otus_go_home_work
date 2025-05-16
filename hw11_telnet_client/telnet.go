@@ -68,7 +68,6 @@ func (cl *OtusTelnetClient) Send() error {
 	if err := scanner.Err(); err != nil {
 		return fmt.Errorf("чтения ввода: %w", err)
 	}
-
 	return nil
 }
 
@@ -78,7 +77,6 @@ func (cl *OtusTelnetClient) Receive() error {
 		_, err := fmt.Fprintln(cl.out, scanner.Text())
 		if err != nil {
 			return fmt.Errorf("не удалось получить сообщение: %w", err)
-
 		}
 	}
 	return nil

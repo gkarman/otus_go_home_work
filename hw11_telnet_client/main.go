@@ -31,7 +31,7 @@ func main() {
 	client := NewTelnetClient(address, args.Timeout, os.Stdin, os.Stdout)
 	defer closeClient(client)
 	if err := client.Connect(); err != nil {
-		log.Fatalf("подключение не удалось %v", err)
+		log.Printf("подключение не удалось %v", err)
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
