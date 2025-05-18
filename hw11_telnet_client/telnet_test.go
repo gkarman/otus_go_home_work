@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"net"
 	"sync"
@@ -62,4 +63,15 @@ func TestTelnetClient(t *testing.T) {
 
 		wg.Wait()
 	})
+}
+
+func TestTelnetClient_ConnectTimeout(t *testing.T) {
+	unreachableAddr := "10.255.255.1:12345"
+	var netErr net.Error
+
+	timeout := 1 * time.Second
+	client := NewTelnetClient(unreachableAddr, timeout, nil, nil)
+
+	err := client.Connect()
+	require.True(t, errors.As(err, &netErr) && netErr.Timeout(), "ожидалась ошибка таймаута, а не: %v", err)
 }
