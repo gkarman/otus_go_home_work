@@ -12,7 +12,7 @@ var ErrConfigUnmarshal = errors.New("ошибка разбора конфига"
 
 type Config struct {
 	Logger  LoggerConf  `yaml:"logger"`
-	Storage StorageConf `yaml:"db"`
+	Storage StorageConf `yaml:"storage"`
 }
 
 type LoggerConf struct {
@@ -20,6 +20,7 @@ type LoggerConf struct {
 }
 
 type StorageConf struct {
+	Type     string `yaml:"type"`
 	Host     string `yaml:"host"`
 	DB       string `yaml:"db"`
 	User     string `yaml:"user"`

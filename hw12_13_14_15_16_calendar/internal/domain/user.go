@@ -1,4 +1,4 @@
-package storage
+package domain
 
 type User struct {
 	ID   string
