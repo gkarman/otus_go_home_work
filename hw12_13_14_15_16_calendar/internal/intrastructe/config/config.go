@@ -28,6 +28,11 @@ type StorageConf struct {
 	Port     string `yaml:"port"`
 }
 
+type ServerConf struct {
+	Host string `yaml:"host"`
+	Port string `yaml:"port"`
+}
+
 func Load(f string) (*Config, error) {
 	data, err := os.ReadFile(f)
 	if err != nil {

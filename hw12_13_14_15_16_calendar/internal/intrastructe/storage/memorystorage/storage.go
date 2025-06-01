@@ -6,20 +6,21 @@ import (
 	"time"
 
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain"
+	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/entity"
 )
 
 type Storage struct {
 	mu     sync.RWMutex
-	events map[string]domain.Event
+	events map[string]entity.Event
 }
 
 func New() *Storage {
 	return &Storage{
-		events: make(map[string]domain.Event),
+		events: make(map[string]entity.Event),
 	}
 }
 
-func (s *Storage) CreateEvent(ctx context.Context, event domain.Event) error {
+func (s *Storage) CreateEvent(ctx context.Context, event entity.Event) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -31,7 +32,7 @@ func (s *Storage) CreateEvent(ctx context.Context, event domain.Event) error {
 	return nil
 }
 
-func (s *Storage) UpdateEvent(ctx context.Context, event domain.Event) error {
+func (s *Storage) UpdateEvent(ctx context.Context, event entity.Event) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -55,11 +56,11 @@ func (s *Storage) DeleteEvent(ctx context.Context, eventID string) error {
 	return nil
 }
 
-func (s *Storage) ListEvents(ctx context.Context, userID string, from, to time.Time) ([]domain.Event, error) {
+func (s *Storage) ListEvents(ctx context.Context, userID string, from, to time.Time) ([]entity.Event, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	var result []domain.Event
+	var result []entity.Event
 	for _, event := range s.events {
 		if event.UserId == userID && event.TimeStart.After(from) && event.TimeStart.Before(to) {
 			result = append(result, event)

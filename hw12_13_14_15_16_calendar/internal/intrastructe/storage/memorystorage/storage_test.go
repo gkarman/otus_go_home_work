@@ -6,14 +6,15 @@ import (
 	"time"
 
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain"
+	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/entity"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
-func makeTestEvent(userID string) domain.Event {
+func makeTestEvent(userID string) entity.Event {
 	id := uuid.New().String()
 	start := time.Now().Add(time.Hour)
-	return domain.Event{
+	return entity.Event{
 		ID:           id,
 		Title:        "Test Event",
 		TimeStart:    start,
@@ -76,7 +77,7 @@ func TestStorage_ListEvents(t *testing.T) {
 	now := time.Now()
 	userID := "user1"
 
-	event1 := domain.Event{
+	event1 := entity.Event{
 		ID:        uuid.New().String(),
 		Title:     "Event 1",
 		TimeStart: now.Add(1 * time.Hour),
@@ -84,7 +85,7 @@ func TestStorage_ListEvents(t *testing.T) {
 		UserId:    userID,
 	}
 
-	event2 := domain.Event{
+	event2 := entity.Event{
 		ID:        uuid.New().String(),
 		Title:     "Event 2",
 		TimeStart: now.Add(3 * time.Hour),
@@ -92,7 +93,7 @@ func TestStorage_ListEvents(t *testing.T) {
 		UserId:    userID,
 	}
 
-	event3 := domain.Event{
+	event3 := entity.Event{
 		ID:        uuid.New().String(),
 		Title:     "Event 3",
 		TimeStart: now.Add(10 * time.Hour),

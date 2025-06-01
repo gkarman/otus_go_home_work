@@ -3,9 +3,12 @@ package sqlstorage
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain"
+	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/entity"
+	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/intrastructe/config"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
@@ -14,19 +17,28 @@ type Storage struct {
 	db *sqlx.DB
 }
 
-func New(dsn string) (*Storage, error) {
+func New(cfg config.StorageConf) *Storage {
+	dsn := fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		cfg.User,
+		cfg.Password,
+		cfg.Host,
+		cfg.Port,
+		cfg.DB,
+	)
+
 	db, err := sqlx.Connect("postgres", dsn)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to DB: %w", err)
+		log.Fatalln("error connect to db: ", err)
 	}
-	return &Storage{db: db}, nil
+	return &Storage{db: db}
 }
 
 func (s *Storage) Close(ctx context.Context) error {
 	return s.db.Close()
 }
 
-func (s *Storage) CreateEvent(ctx context.Context, event domain.Event) error {
+func (s *Storage) CreateEvent(ctx context.Context, event entity.Event) error {
 	query := `
 		INSERT INTO events (id, title, time_start, time_end, description, user_id, notify_before)
 		VALUES (:id, :title, :time_start, :time_end, :description, :user_id, :notify_before)
@@ -46,7 +58,7 @@ func (s *Storage) CreateEvent(ctx context.Context, event domain.Event) error {
 	return nil
 }
 
-func (s *Storage) UpdateEvent(ctx context.Context, event domain.Event) error {
+func (s *Storage) UpdateEvent(ctx context.Context, event entity.Event) error {
 	query := `
 		UPDATE events
 		SET title=:title, time_start=:time_start, time_end=:time_end,
@@ -84,8 +96,8 @@ func (s *Storage) DeleteEvent(ctx context.Context, eventID string) error {
 	return nil
 }
 
-func (s *Storage) ListEvents(ctx context.Context, userID string, from, to time.Time) ([]domain.Event, error) {
-	var events []domain.Event
+func (s *Storage) ListEvents(ctx context.Context, userID string, from, to time.Time) ([]entity.Event, error) {
+	var events []entity.Event
 
 	query := `
 		SELECT id, title, time_start, time_end, description, user_id, notify_before
