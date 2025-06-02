@@ -20,7 +20,7 @@ func makeTestEvent(userID string) entity.Event {
 		TimeStart:    start,
 		TimeEnd:      start.Add(time.Hour),
 		Description:  "A test event",
-		UserId:       userID,
+		UserID:       userID,
 		NotifyBefore: 10 * time.Minute,
 	}
 }
@@ -82,7 +82,7 @@ func TestStorage_ListEvents(t *testing.T) {
 		Title:     "Event 1",
 		TimeStart: now.Add(1 * time.Hour),
 		TimeEnd:   now.Add(2 * time.Hour),
-		UserId:    userID,
+		UserID:    userID,
 	}
 
 	event2 := entity.Event{
@@ -90,7 +90,7 @@ func TestStorage_ListEvents(t *testing.T) {
 		Title:     "Event 2",
 		TimeStart: now.Add(3 * time.Hour),
 		TimeEnd:   now.Add(4 * time.Hour),
-		UserId:    userID,
+		UserID:    userID,
 	}
 
 	event3 := entity.Event{
@@ -98,7 +98,7 @@ func TestStorage_ListEvents(t *testing.T) {
 		Title:     "Event 3",
 		TimeStart: now.Add(10 * time.Hour),
 		TimeEnd:   now.Add(11 * time.Hour),
-		UserId:    userID,
+		UserID:    userID,
 	}
 
 	err := s.CreateEvent(ctx, event1)

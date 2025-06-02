@@ -62,7 +62,7 @@ func (s *Storage) ListEvents(ctx context.Context, userID string, from, to time.T
 
 	var result []entity.Event
 	for _, event := range s.events {
-		if event.UserId == userID && event.TimeStart.After(from) && event.TimeStart.Before(to) {
+		if event.UserID == userID && event.TimeStart.After(from) && event.TimeStart.Before(to) {
 			result = append(result, event)
 		}
 	}

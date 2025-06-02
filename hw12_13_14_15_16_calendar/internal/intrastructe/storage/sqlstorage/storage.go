@@ -49,7 +49,7 @@ func (s *Storage) CreateEvent(ctx context.Context, event entity.Event) error {
 		"time_start":    event.TimeStart,
 		"time_end":      event.TimeEnd,
 		"description":   event.Description,
-		"user_id":       event.UserId,
+		"user_id":       event.UserID,
 		"notify_before": int64(event.NotifyBefore.Seconds()),
 	})
 	if err != nil {
@@ -71,7 +71,7 @@ func (s *Storage) UpdateEvent(ctx context.Context, event entity.Event) error {
 		"time_start":    event.TimeStart,
 		"time_end":      event.TimeEnd,
 		"description":   event.Description,
-		"user_id":       event.UserId,
+		"user_id":       event.UserID,
 		"notify_before": int64(event.NotifyBefore.Seconds()),
 	})
 	if err != nil {
