@@ -13,6 +13,6 @@ type CreateEvent struct {
 	logger     logger.Logger
 }
 
-func (c *CreateEvent) Run(ctx context.Context, request requestdto.CreateEvent) error {
+func (c *CreateEvent) Run(_ context.Context, _ requestdto.CreateEvent) error {
 	return nil
 }

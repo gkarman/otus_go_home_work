@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -30,7 +31,7 @@ var migrateCmd = &cobra.Command{
 			log.Fatalf("ошибка создания мигратора: %v", err)
 		}
 
-		if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 			log.Fatalf("ошибка миграции: %v", err)
 		}
 

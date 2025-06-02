@@ -53,6 +53,30 @@ func TestStorage_UpdateEvent(t *testing.T) {
 	nonexistent := makeTestEvent("user1")
 	err = s.UpdateEvent(ctx, nonexistent)
 	require.ErrorIs(t, err, domain.ErrEntityNotFound)
+
+	// Создаем событие с несуществующим ID
+	nonexistent = makeTestEvent("user2")
+	nonexistent.ID = "nonexistent-id"
+
+	err = s.UpdateEvent(ctx, nonexistent)
+	require.ErrorIs(t, err, domain.ErrEntityNotFound)
+}
+
+func TestStorage_UpdateNotExistEvent(t *testing.T) {
+	s := New()
+	ctx := context.Background()
+
+	event := makeTestEvent("user2")
+	err := s.CreateEvent(ctx, event)
+	require.NoError(t, err)
+
+	event.Title = "Updated title"
+	err = s.UpdateEvent(ctx, event)
+	require.NoError(t, err)
+
+	nonexistent := makeTestEvent("user1")
+	err = s.UpdateEvent(ctx, nonexistent)
+	require.ErrorIs(t, err, domain.ErrEntityNotFound)
 }
 
 func TestStorage_DeleteEvent(t *testing.T) {

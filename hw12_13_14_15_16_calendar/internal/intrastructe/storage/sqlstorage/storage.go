@@ -10,6 +10,7 @@ import (
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/entity"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/intrastructe/config"
 	"github.com/jmoiron/sqlx"
+	// регистрирует драйвер PostgreSQL для database/sql
 	_ "github.com/lib/pq"
 )
 
@@ -34,7 +35,7 @@ func New(cfg config.StorageConf) *Storage {
 	return &Storage{db: db}
 }
 
-func (s *Storage) Close(ctx context.Context) error {
+func (s *Storage) Close(_ context.Context) error {
 	return s.db.Close()
 }
 
@@ -111,7 +112,7 @@ func (s *Storage) ListEvents(ctx context.Context, userID string, from, to time.T
 	}
 
 	for i := range events {
-		events[i].NotifyBefore = time.Duration(events[i].NotifyBefore) * time.Second
+		events[i].NotifyBefore = events[i].NotifyBefore * time.Second
 	}
 
 	return events, nil

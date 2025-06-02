@@ -39,7 +39,7 @@ func loggingMiddleware(next http.Handler) http.Handler {
 			userAgent,
 		)
 
-		file, err := os.OpenFile("logs/http.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		file, err := os.OpenFile("logs/http.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 		if err != nil {
 			fmt.Println("could not open access.log:", err)
 			return

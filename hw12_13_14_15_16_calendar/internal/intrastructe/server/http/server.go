@@ -38,8 +38,9 @@ func (s *Server) Start(ctx context.Context) error {
 
 	address := net.JoinHostPort(s.cfg.Host, s.cfg.Port)
 	s.httpServer = &http.Server{
-		Addr:    address,
-		Handler: mux,
+		Addr:              address,
+		Handler:           mux,
+		ReadHeaderTimeout: 5 * time.Second,
 	}
 
 	go func() {

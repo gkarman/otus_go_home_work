@@ -3,7 +3,7 @@ package requestdto
 import "time"
 
 type CreateEvent struct {
-	UserId       string
+	UserID       string
 	Title        string
 	Description  string
 	TimeStart    time.Time
@@ -20,7 +20,7 @@ func NewCreateEvent(
 	notifyBefore time.Duration,
 ) *CreateEvent {
 	return &CreateEvent{
-		UserId:       userID,
+		UserID:       userID,
 		Title:        title,
 		Description:  description,
 		TimeStart:    start,
