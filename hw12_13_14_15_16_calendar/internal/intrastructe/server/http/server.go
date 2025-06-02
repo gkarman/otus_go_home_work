@@ -11,8 +11,7 @@ import (
 )
 
 type Server struct {
-	host       string
-	port       string
+	cfg        config.ServerConf
 	logger     logger.Logger
 	app        Application
 	httpServer *http.Server
@@ -21,30 +20,30 @@ type Server struct {
 type Application interface { // TODO
 }
 
-func New(logger logger.Logger, app Application, cfg config.ServerConf) *Server {
+func New(cfg config.ServerConf, logger logger.Logger, app Application) *Server {
 	return &Server{
 		logger: logger,
 		app:    app,
-		host:   cfg.Host,
-		port:   cfg.Port,
+		cfg:    cfg,
 	}
 }
 
 func (s *Server) Start(ctx context.Context) error {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/hello", loggingMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Hello word"))
-	})
-	address := net.JoinHostPort(s.host, s.port)
+		w.Write([]byte("Hello world"))
+	})))
+
+	address := net.JoinHostPort(s.cfg.Host, s.cfg.Port)
 	s.httpServer = &http.Server{
 		Addr:    address,
 		Handler: mux,
 	}
 
 	go func() {
-		s.logger.Info("HTTP server starting on :8080")
+		s.logger.Info("HTTP server starting")
 		if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			s.logger.Error("HTTP server failed: " + err.Error())
 		}
@@ -55,6 +54,9 @@ func (s *Server) Start(ctx context.Context) error {
 }
 
 func (s *Server) Stop(ctx context.Context) error {
+	if s.httpServer == nil {
+		return nil
+	}
 	s.logger.Info("Shutting down HTTP server...")
 
 	// Graceful shutdown с таймаутом

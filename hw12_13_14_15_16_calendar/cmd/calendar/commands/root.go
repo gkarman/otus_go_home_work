@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/intrastructe/app"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/intrastructe/config"
@@ -50,24 +49,14 @@ func runCalendar() {
 	st, err := storage.New(cfg.Storage)
 	if err != nil {
 		logg.Error("failed to init storage: " + err.Error())
+		os.Exit(1) //nolint:gocritic
 	}
 	calendar := app.New(logg, st)
-	server := internalhttp.New(logg, calendar)
+	server := internalhttp.New(cfg.Server, logg, calendar)
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	defer cancel()
-
-	go func() {
-		<-ctx.Done()
-
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
-		defer cancel()
-
-		if err := server.Stop(ctx); err != nil {
-			logg.Error("failed to stop http server: " + err.Error())
-		}
-	}()
 
 	logg.Info("calendar is running...")
 
@@ -76,6 +65,4 @@ func runCalendar() {
 		cancel()
 		os.Exit(1) //nolint:gocritic
 	}
-
-	fmt.Println(cfg)
 }
