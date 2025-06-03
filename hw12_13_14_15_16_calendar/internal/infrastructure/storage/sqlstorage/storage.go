@@ -8,9 +8,9 @@ import (
 
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/entity"
-	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/intrastructe/config"
+	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/config"
 	"github.com/jmoiron/sqlx"
-	// регистрирует драйвер PostgreSQL для database/sql
+	// регистрирует драйвер PostgreSQL для database/sql.
 	_ "github.com/lib/pq"
 )
 
@@ -109,10 +109,6 @@ func (s *Storage) ListEvents(ctx context.Context, userID string, from, to time.T
 	err := s.db.SelectContext(ctx, &events, query, userID, from, to)
 	if err != nil {
 		return nil, fmt.Errorf("list events: %w", err)
-	}
-
-	for i := range events {
-		events[i].NotifyBefore = events[i].NotifyBefore * time.Second
 	}
 
 	return events, nil

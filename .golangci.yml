@@ -12,18 +12,48 @@ linters-settings:
     rules:
       Main:
         files:
-          - $all
           - "!$test"
+          - cmd/calendar/**
         allow:
           - $gostd
           - github.com/cheggaaa/pb/v3
           - github.com/spf13/pflag
+          - github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/cmd/calendar/commands
       Test:
         files:
           - $test
         allow:
           - $gostd
           - github.com/stretchr/testify
+          - github.com/google/uuid
+          - github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/...
+          - github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain
+          - github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/...
+          - github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/entity
+          - github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/entity/...
+      Infrastructure:
+        files:
+          - "github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/..."
+        allow:
+          - $gostd
+          - github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/...
+          - github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/application/...
+          - github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/...
+          - github.com/cheggaaa/pb/v3
+          - github.com/spf13/pflag
+      Application:
+        files:
+          - "github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/application/..."
+        allow:
+          - $gostd
+          - github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/application/...
+          - github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/...
+      Domain:
+        files:
+          - "github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/..."
+        allow:
+          - $gostd
+          - github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/...
 issues:
   exclude-rules:
     - path: _test\.go

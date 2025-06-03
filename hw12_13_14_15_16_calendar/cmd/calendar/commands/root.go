@@ -8,11 +8,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/intrastructe/app"
-	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/intrastructe/config"
-	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/intrastructe/logger"
-	internalhttp "github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/intrastructe/server/http"
-	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/intrastructe/storage"
+	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/app"
+	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/config"
+	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/logger"
+	internalhttp "github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/server/http"
+	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/storage"
 	"github.com/spf13/cobra"
 )
 
@@ -24,7 +24,7 @@ var (
 var rootCmd = &cobra.Command{
 	Use:   "calendar",
 	Short: "Calendar service",
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+	PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
 		var err error
 		cfg, err = config.Load(configPath)
 		if err != nil {
@@ -32,7 +32,7 @@ var rootCmd = &cobra.Command{
 		}
 		return nil
 	},
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		runCalendar()
 	},
 }

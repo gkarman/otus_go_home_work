@@ -17,7 +17,7 @@ var (
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Показать информацию о версии сборки",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		if err := json.NewEncoder(os.Stdout).Encode(struct {
 			Release   string `json:"release"`
 			BuildDate string `json:"buildDate"`

@@ -6,7 +6,9 @@ import (
 	"log"
 
 	"github.com/golang-migrate/migrate/v4"
+	// так нужно.
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	// так нужно.
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/spf13/cobra"
 )
@@ -14,7 +16,7 @@ import (
 var migrateRollbackCmd = &cobra.Command{
 	Use:   "migrate:rollback",
 	Short: "Откатить последнюю миграцию",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		fmt.Println("Откат последней миграции...")
 
 		dsn := fmt.Sprintf(

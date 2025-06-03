@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/logger"
-	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/intrastructe/config"
+	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/config"
 )
 
 type Server struct {
@@ -31,7 +31,7 @@ func New(cfg config.ServerConf, logger logger.Logger, app Application) *Server {
 func (s *Server) Start(ctx context.Context) error {
 	mux := http.NewServeMux()
 
-	mux.Handle("/hello", loggingMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/hello", loggingMiddleware(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Hello world"))
 	})))

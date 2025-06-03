@@ -7,8 +7,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var ErrConfigNotFound = errors.New("файл конфигурации не найден")
-var ErrConfigUnmarshal = errors.New("ошибка разбора конфига")
+var (
+	ErrConfigNotFound  = errors.New("файл конфигурации не найден")
+	ErrConfigUnmarshal = errors.New("ошибка разбора конфига")
+)
 
 type Config struct {
 	Logger  LoggerConf  `yaml:"logger"`
