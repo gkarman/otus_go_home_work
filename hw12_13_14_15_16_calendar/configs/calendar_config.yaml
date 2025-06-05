@@ -1,0 +1,14 @@
+storage:
+  type: "memory" # или "sql"
+  host: "localhost"
+  port: 5432
+  db: "calendar"
+  user: "user"
+  password: "pass"
+
+logger:
+  level: "INFO"
+
+server:
+  host: "localhost"
+  port: 8080
