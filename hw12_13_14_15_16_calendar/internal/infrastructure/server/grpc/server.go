@@ -2,6 +2,7 @@ package internalgrpc
 
 import (
 	"context"
+	"errors"
 	"net"
 
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/api/pb"
@@ -46,7 +47,7 @@ func (s *Server) Start(_ context.Context) error {
 
 	// Блокирующий вызов
 	s.logger.Info("gRPC server starting at " + address)
-	if err := s.grpcServer.Serve(lsn); err != nil && err != grpc.ErrServerStopped {
+	if err := s.grpcServer.Serve(lsn); err != nil && !errors.Is(err, grpc.ErrServerStopped) {
 		s.logger.Error("gRPC server failed: " + err.Error())
 		return err
 	}

@@ -2,6 +2,7 @@ package internalhttp
 
 import (
 	"context"
+	"errors"
 	"net"
 	"net/http"
 	"time"
@@ -9,6 +10,8 @@ import (
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/logger"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/config"
 )
+
+const timeout = 5 * time.Second
 
 type Server struct {
 	cfg        config.ServerConf
@@ -45,7 +48,7 @@ func (s *Server) Start(_ context.Context) error {
 
 	s.logger.Info("HTTP server starting at " + address)
 	err := s.httpServer.ListenAndServe()
-	if err != nil && err != http.ErrServerClosed {
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		s.logger.Error("HTTP server failed: " + err.Error())
 		return err
 	}
@@ -60,7 +63,7 @@ func (s *Server) Stop(ctx context.Context) error {
 	s.logger.Info("Shutting down HTTP server...")
 
 	// Graceful shutdown с таймаутом
-	shutdownCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	if err := s.httpServer.Shutdown(shutdownCtx); err != nil {

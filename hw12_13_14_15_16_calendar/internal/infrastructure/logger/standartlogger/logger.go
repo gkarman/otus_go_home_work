@@ -2,6 +2,7 @@ package standartlogger
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"time"
 )
@@ -21,7 +22,9 @@ var levelMap = map[string]int{
 }
 
 type Logger struct {
-	level int
+	level       int
+	httpLogFile *os.File
+	grpcLogFile *os.File
 }
 
 func New(level string) *Logger {
