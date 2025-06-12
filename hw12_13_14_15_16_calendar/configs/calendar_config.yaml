@@ -12,3 +12,7 @@ logger:
 server:
   host: "localhost"
   port: 8080
+
+serverGrpc:
+  host: "localhost"
+  port: 50051

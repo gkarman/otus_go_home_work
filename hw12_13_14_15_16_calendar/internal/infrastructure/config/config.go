@@ -13,9 +13,10 @@ var (
 )
 
 type Config struct {
-	Logger  LoggerConf  `yaml:"logger"`
-	Storage StorageConf `yaml:"storage"`
-	Server  ServerConf  `yaml:"server"`
+	Logger     LoggerConf     `yaml:"logger"`
+	Storage    StorageConf    `yaml:"storage"`
+	Server     ServerConf     `yaml:"server"`
+	ServerGrpc ServerGrpcConf `yaml:"serverGrpc"`
 }
 
 type LoggerConf struct {
@@ -32,6 +33,11 @@ type StorageConf struct {
 }
 
 type ServerConf struct {
+	Host string `yaml:"host"`
+	Port string `yaml:"port"`
+}
+
+type ServerGrpcConf struct {
 	Host string `yaml:"host"`
 	Port string `yaml:"port"`
 }

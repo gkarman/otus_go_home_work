@@ -28,7 +28,7 @@ func New(cfg config.ServerConf, logger logger.Logger, app Application) *Server {
 	}
 }
 
-func (s *Server) Start(ctx context.Context) error {
+func (s *Server) Start(_ context.Context) error {
 	mux := http.NewServeMux()
 
 	mux.Handle("/hello", loggingMiddleware(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
@@ -43,15 +43,14 @@ func (s *Server) Start(ctx context.Context) error {
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
-	go func() {
-		s.logger.Info("HTTP server starting")
-		if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			s.logger.Error("HTTP server failed: " + err.Error())
-		}
-	}()
+	s.logger.Info("HTTP server starting at " + address)
+	err := s.httpServer.ListenAndServe()
+	if err != nil && err != http.ErrServerClosed {
+		s.logger.Error("HTTP server failed: " + err.Error())
+		return err
+	}
 
-	<-ctx.Done()
-	return s.Stop(context.Background())
+	return nil
 }
 
 func (s *Server) Stop(ctx context.Context) error {
@@ -72,5 +71,3 @@ func (s *Server) Stop(ctx context.Context) error {
 	s.logger.Info("HTTP server stopped gracefully")
 	return nil
 }
-
-// TODO

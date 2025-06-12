@@ -34,4 +34,7 @@ install-lint-deps:
 
 lint: install-lint-deps
 
+generate:
+	go generate ./...
+
 .PHONY: build run build-img run-img version test lint
