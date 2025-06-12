@@ -39,13 +39,13 @@ func (s *Server) Start(_ context.Context) error {
 	}
 
 	s.grpcServer = grpc.NewServer(
-	//grpc.ChainUnaryInterceptor(validate.UnaryServerRequestValidatorInterceptor(validate.ValidateReq)
-	//),
+		grpc.ChainUnaryInterceptor(
+			UnaryLoggingInterceptor(s.logger),
+		),
 	)
 
 	pb.RegisterEventServiceServer(s.grpcServer, s)
 
-	// Блокирующий вызов
 	s.logger.Info("gRPC server starting at " + address)
 	if err := s.grpcServer.Serve(lsn); err != nil && !errors.Is(err, grpc.ErrServerStopped) {
 		s.logger.Error("gRPC server failed: " + err.Error())
