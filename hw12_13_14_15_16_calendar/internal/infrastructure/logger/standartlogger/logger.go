@@ -58,6 +58,10 @@ func (l *Logger) log(level int, prefix string, msg string) {
 	fmt.Printf("[%s] [%s] %s\n", timestamp, prefix, msg)
 }
 
+func (l *Logger) LogToFile(msg string) {
+	_, _ = l.httpLogFile.WriteString(msg + "\n")
+}
+
 func (l *Logger) Info(msg string) {
 	l.log(LevelInfo, "INFO", msg)
 }

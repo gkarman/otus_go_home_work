@@ -37,7 +37,7 @@ func (s *Server) Start(_ context.Context) error {
 	mux.Handle("/hello", loggingMiddleware(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Hello world"))
-	})))
+	}), s.logger))
 
 	address := net.JoinHostPort(s.cfg.Host, s.cfg.Port)
 	s.httpServer = &http.Server{

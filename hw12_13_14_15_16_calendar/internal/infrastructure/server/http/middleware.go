@@ -3,8 +3,9 @@ package internalhttp
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"time"
+
+	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/logger"
 )
 
 type responseWriter struct {
@@ -17,7 +18,7 @@ func (rw *responseWriter) WriteHeader(code int) {
 	rw.ResponseWriter.WriteHeader(code)
 }
 
-func loggingMiddleware(next http.Handler) http.Handler {
+func loggingMiddleware(next http.Handler, logger logger.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		latency := time.Since(start)
@@ -39,13 +40,6 @@ func loggingMiddleware(next http.Handler) http.Handler {
 			userAgent,
 		)
 
-		file, err := os.OpenFile("logs/http.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
-		if err != nil {
-			fmt.Println("could not open access.log:", err)
-			return
-		}
-		defer file.Close()
-
-		_, _ = file.WriteString(logMessage + "\n")
+		logger.LogToFile(logMessage)
 	})
 }

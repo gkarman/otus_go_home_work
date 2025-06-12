@@ -5,4 +5,5 @@ type Logger interface {
 	Warn(msg string)
 	Error(msg string)
 	Debug(msg string)
+	LogToFile(msg string)
 }
