@@ -48,7 +48,11 @@ func Execute() {
 }
 
 func runCalendar() {
-	logg := logger.New(cfg.Logger)
+	logg, err := logger.New(cfg.Logger)
+	if err != nil {
+		os.Exit(1)
+	}
+
 	st, err := storage.New(cfg.Storage)
 	if err != nil {
 		logg.Error("failed to init storage: " + err.Error())

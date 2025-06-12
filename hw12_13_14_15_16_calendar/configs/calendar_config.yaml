@@ -9,7 +9,6 @@ storage:
 logger:
   level: "INFO"
   pathToHttpLog: "logs/http.log"
-  pathTogRpsLog: "logs/grpc.log"
 
 server:
   host: "localhost"

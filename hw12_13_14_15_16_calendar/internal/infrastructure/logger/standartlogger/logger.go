@@ -1,6 +1,7 @@
 package standartlogger
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -21,15 +22,25 @@ var levelMap = map[string]int{
 	"debug": LevelDebug,
 }
 
+var ErrFileNotOpened = errors.New("file is not opened")
+
 type Logger struct {
 	level       int
 	httpLogFile *os.File
-	grpcLogFile *os.File
 }
 
-func New(level string) *Logger {
+func New(level string, pathToHTTPLog string) (*Logger, error) {
 	parsedLevel := parseLevel(level)
-	return &Logger{level: parsedLevel}
+
+	httpLogFile, err := os.OpenFile(pathToHTTPLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	if err != nil {
+		return nil, ErrFileNotOpened
+	}
+
+	return &Logger{
+		level:       parsedLevel,
+		httpLogFile: httpLogFile,
+	}, nil
 }
 
 func parseLevel(level string) int {

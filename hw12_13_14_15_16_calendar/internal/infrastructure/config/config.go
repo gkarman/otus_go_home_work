@@ -22,7 +22,6 @@ type Config struct {
 type LoggerConf struct {
 	Level         string `yaml:"level"`
 	PathToHTTPLog string `yaml:"pathToHttpLog"`
-	PathTogRpsLog string `yaml:"pathTogRpsLog"`
 }
 
 type StorageConf struct {
