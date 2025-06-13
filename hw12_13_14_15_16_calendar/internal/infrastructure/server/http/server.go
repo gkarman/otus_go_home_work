@@ -2,6 +2,7 @@ package internalhttp
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net"
 	"net/http"
@@ -30,39 +31,14 @@ func New(cfg config.ServerConf, logger logger.Logger, app application.Calendar) 
 	}
 }
 
-func (s *Server) Start(ctx context.Context) error {
-	mux := http.NewServeMux()
-
-	mux.Handle("/hello", loggingMiddleware(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Hello world"))
-	}), s.logger))
-
-	mux.Handle("/create", loggingMiddleware(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-
-		requestDto := requestdto.CreateEvent{
-			UserID:       "11111111-1111-1111-1111-111111111111",
-			Title:        "Meeting with team",
-			Description:  "Discuss project updates",
-			TimeStart:    time.Date(2025, 6, 10, 14, 0, 0, 0, time.UTC),
-			TimeEnd:      time.Date(2025, 6, 10, 15, 0, 0, 0, time.UTC),
-			NotifyBefore: 15 * time.Minute,
-		}
-
-		err := s.app.CreateEvent(ctx, requestDto)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
-		} else {
-			w.WriteHeader(http.StatusOK)
-		}
-
-	}), s.logger))
+func (s *Server) Start(_ context.Context) error {
+	mux := s.registerRoutes()
+	wrappedMux := loggingMiddleware(mux, s.logger)
 
 	address := net.JoinHostPort(s.cfg.Host, s.cfg.Port)
 	s.httpServer = &http.Server{
 		Addr:              address,
-		Handler:           mux,
+		Handler:           wrappedMux,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
@@ -93,4 +69,46 @@ func (s *Server) Stop(ctx context.Context) error {
 
 	s.logger.Info("HTTP server stopped gracefully")
 	return nil
+}
+
+func (s *Server) registerRoutes() *http.ServeMux {
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/hello", s.handleHello())
+	mux.HandleFunc("/create", s.handleCreate())
+
+	return mux
+}
+
+func (s *Server) handleHello() http.HandlerFunc {
+	return func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Hello world"))
+	}
+}
+
+func (s *Server) handleCreate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		var requestDto requestdto.CreateEvent
+		if err := json.NewDecoder(r.Body).Decode(&requestDto); err != nil {
+			http.Error(w, "invalid request body: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		ctx := r.Context()
+
+		response, err := s.app.CreateEvent(ctx, requestDto)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(response.ID))
+	}
 }
