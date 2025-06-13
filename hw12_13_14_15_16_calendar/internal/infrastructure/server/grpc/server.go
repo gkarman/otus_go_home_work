@@ -7,6 +7,7 @@ import (
 
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/api/pb"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/application"
+	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/application/requestdto"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/logger"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/config"
 	"google.golang.org/grpc"
@@ -22,8 +23,24 @@ type Server struct {
 	pb.UnimplementedEventServiceServer
 }
 
-func (s *Server) CreateEvent(_ context.Context, _ *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateEvent not implemented")
+func (s *Server) CreateEvent(ctx context.Context, req *pb.CreateEventRequest) (*pb.CreateEventResponse, error) {
+	requestDto := requestdto.CreateEvent{
+		UserID:       req.GetUserId(),
+		Title:        req.GetTitle(),
+		Description:  req.GetDescription(),
+		TimeStart:    req.GetStartTime().AsTime(),
+		TimeEnd:      req.GetEndTime().AsTime(),
+		NotifyBefore: req.GetNotifyBefore().AsDuration(),
+	}
+
+	response, err := s.app.CreateEvent(ctx, requestDto)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "some error")
+	}
+
+	return &pb.CreateEventResponse{
+		Id: response.ID,
+	}, nil
 }
 
 func New(cfg config.ServerGrpcConf, logger logger.Logger, app application.Calendar) *Server {
