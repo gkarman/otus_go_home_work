@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/application"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/logger"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/config"
 )
@@ -16,18 +17,15 @@ const timeout = 5 * time.Second
 type Server struct {
 	cfg        config.ServerConf
 	logger     logger.Logger
-	app        Application
+	app        application.Calendar
 	httpServer *http.Server
 }
 
-type Application interface { // TODO
-}
-
-func New(cfg config.ServerConf, logger logger.Logger, app Application) *Server {
+func New(cfg config.ServerConf, logger logger.Logger, app application.Calendar) *Server {
 	return &Server{
 		logger: logger,
-		app:    app,
 		cfg:    cfg,
+		app:    app,
 	}
 }
 

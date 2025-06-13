@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/api/pb"
+	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/application"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/logger"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/config"
 	"google.golang.org/grpc"
@@ -16,6 +17,7 @@ import (
 type Server struct {
 	cfg        config.ServerGrpcConf
 	logger     logger.Logger
+	app        application.Calendar
 	grpcServer *grpc.Server
 	pb.UnimplementedEventServiceServer
 }
@@ -24,10 +26,11 @@ func (s *Server) CreateEvent(_ context.Context, _ *pb.CreateEventRequest) (*pb.C
 	return nil, status.Errorf(codes.Unimplemented, "method CreateEvent not implemented")
 }
 
-func New(cfg config.ServerGrpcConf, logger logger.Logger) *Server {
+func New(cfg config.ServerGrpcConf, logger logger.Logger, app application.Calendar) *Server {
 	return &Server{
 		logger: logger,
 		cfg:    cfg,
+		app:    app,
 	}
 }
 

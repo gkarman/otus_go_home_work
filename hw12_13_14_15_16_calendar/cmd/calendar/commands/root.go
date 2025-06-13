@@ -58,9 +58,9 @@ func runCalendar() {
 		logg.Error("failed to init storage: " + err.Error())
 		os.Exit(1)
 	}
-	calendar := app.New(logg, st)
-	server := internalhttp.New(cfg.Server, logg, calendar)
-	serverGrpc := internalgrpc.New(cfg.ServerGrpc, logg)
+	calendarApp := app.NewCalendarApp(logg, st)
+	server := internalhttp.New(cfg.Server, logg, calendarApp)
+	serverGrpc := internalgrpc.New(cfg.ServerGrpc, logg, calendarApp)
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	defer stop()
