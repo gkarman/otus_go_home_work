@@ -6,8 +6,8 @@ type Event struct {
 	ID           string
 	UserID       string
 	Title        string
+	Description  string
 	TimeStart    time.Time
 	TimeEnd      time.Time
-	Description  string
 	NotifyBefore time.Duration
 }

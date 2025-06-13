@@ -1,5 +1,6 @@
 storage:
-  type: "memory" # или "sql"
+  #type: "memory" # или "sql"
+  type: "sql"
   host: "localhost"
   port: 5432
   db: "calendar"
