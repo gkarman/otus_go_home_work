@@ -32,3 +32,13 @@ func (app *CalendarApp) CreateEvent(ctx context.Context, req requestdto.CreateEv
 
 	return response, nil
 }
+
+func (app *CalendarApp) DeleteEvent(ctx context.Context, req requestdto.DeleteEvent) error {
+	useCase := usecase.NewDeleteEventUseCase(app.st, app.logg)
+	err := useCase.Execute(ctx, &req)
+	if err != nil {
+		return fmt.Errorf("calendar %w", err)
+	}
+
+	return nil
+}

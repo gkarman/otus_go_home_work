@@ -69,3 +69,16 @@ func (s *Storage) ListEvents(_ context.Context, userID string, from, to time.Tim
 
 	return result, nil
 }
+
+func (s *Storage) GetEvent(_ context.Context, userID, eventID string) (entity.Event, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	for _, event := range s.events {
+		if event.ID == eventID && event.UserID == userID {
+			return event, nil
+		}
+	}
+
+	return entity.Event{}, domain.ErrEntityNotFound
+}

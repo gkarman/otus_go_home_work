@@ -19,6 +19,7 @@ message Event {
 
 service EventService {
   rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
+  rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse);
 }
 
 message CreateEventRequest {
@@ -32,4 +33,14 @@ message CreateEventRequest {
 
 message CreateEventResponse {
   string id = 1;
+}
+
+message DeleteEventRequest {
+  string id = 1;
+  string user_id = 2;
+}
+
+message DeleteEventResponse {
+  bool status = 1;
+  string message = 2;
 }

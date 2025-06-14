@@ -43,6 +43,23 @@ func (s *Server) CreateEvent(ctx context.Context, req *pb.CreateEventRequest) (*
 	}, nil
 }
 
+func (s *Server) DeleteEvent(ctx context.Context, req *pb.DeleteEventRequest) (*pb.DeleteEventResponse, error) {
+	requestDto := requestdto.DeleteEvent{
+		ID:     req.GetId(),
+		UserID: req.GetUserId(),
+	}
+
+	err := s.app.DeleteEvent(ctx, requestDto)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "some error")
+	}
+
+	return &pb.DeleteEventResponse{
+		Status:  true,
+		Message: "done",
+	}, nil
+}
+
 func New(cfg config.ServerGrpcConf, logger logger.Logger, app application.Calendar) *Server {
 	return &Server{
 		logger: logger,

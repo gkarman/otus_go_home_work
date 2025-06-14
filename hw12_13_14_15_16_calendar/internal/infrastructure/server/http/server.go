@@ -73,18 +73,10 @@ func (s *Server) Stop(ctx context.Context) error {
 
 func (s *Server) registerRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
-
-	mux.HandleFunc("/hello", s.handleHello())
 	mux.HandleFunc("/create", s.handleCreate())
+	mux.HandleFunc("/delete", s.handleDelete())
 
 	return mux
-}
-
-func (s *Server) handleHello() http.HandlerFunc {
-	return func(w http.ResponseWriter, _ *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Hello world"))
-	}
 }
 
 func (s *Server) handleCreate() http.HandlerFunc {
@@ -110,5 +102,38 @@ func (s *Server) handleCreate() http.HandlerFunc {
 
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(response.ID))
+	}
+}
+
+func (s *Server) handleDelete() http.HandlerFunc {
+	type response struct {
+		Status  bool   `json:"status"`
+		Message string `json:"message"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		var requestDto requestdto.DeleteEvent
+		if err := json.NewDecoder(r.Body).Decode(&requestDto); err != nil {
+			http.Error(w, "invalid request body: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		ctx := r.Context()
+		err := s.app.DeleteEvent(ctx, requestDto)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(response{
+			Status:  true,
+			Message: "event deleted",
+		})
 	}
 }
