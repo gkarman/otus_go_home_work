@@ -21,6 +21,9 @@ service EventService {
   rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
   rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse);
   rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventResponse);
+  rpc EventsDay(EventsDateRequest) returns (EventsDateResponse);
+  rpc EventsWeek(EventsDateRequest) returns (EventsDateResponse);
+  rpc EventsMonth(EventsDateRequest) returns (EventsDateResponse);
 }
 
 message CreateEventRequest {
@@ -53,4 +56,13 @@ message UpdateEventRequest {
 message UpdateEventResponse {
   bool status = 1;
   string message = 2;
+}
+
+message EventsDateRequest {
+  string user_id = 1;
+  string date = 2;
+}
+
+message EventsDateResponse {
+  repeated Event events = 1;
 }

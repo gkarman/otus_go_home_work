@@ -8,11 +8,14 @@ import (
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/api/pb"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/application"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/application/requestdto"
+	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/entity"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/domain/logger"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/config"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Server struct {
@@ -80,6 +83,81 @@ func (s *Server) UpdateEvent(ctx context.Context, req *pb.UpdateEventRequest) (*
 		Status:  true,
 		Message: "done",
 	}, nil
+}
+
+func (s *Server) EventsDay(ctx context.Context, req *pb.EventsDateRequest) (*pb.EventsDateResponse, error) {
+	requestDto := requestdto.EventsOnDate{
+		UserID: req.GetUserId(),
+		Date:   req.GetDate(),
+	}
+
+	resp, err := s.app.EventsDay(ctx, requestDto)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "some error")
+	}
+
+	pbEvents := make([]*pb.Event, 0, len(resp.Events))
+	for _, ev := range resp.Events {
+		pbEvents = append(pbEvents, convertToPbEvent(ev))
+	}
+
+	return &pb.EventsDateResponse{
+		Events: pbEvents,
+	}, nil
+}
+
+func (s *Server) EventsWeek(ctx context.Context, req *pb.EventsDateRequest) (*pb.EventsDateResponse, error) {
+	requestDto := requestdto.EventsOnDate{
+		UserID: req.GetUserId(),
+		Date:   req.GetDate(),
+	}
+
+	resp, err := s.app.EventsWeek(ctx, requestDto)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "some error")
+	}
+
+	pbEvents := make([]*pb.Event, 0, len(resp.Events))
+	for _, ev := range resp.Events {
+		pbEvents = append(pbEvents, convertToPbEvent(ev))
+	}
+
+	return &pb.EventsDateResponse{
+		Events: pbEvents,
+	}, nil
+}
+
+func (s *Server) EventsMonth(ctx context.Context, req *pb.EventsDateRequest) (*pb.EventsDateResponse, error) {
+	requestDto := requestdto.EventsOnDate{
+		UserID: req.GetUserId(),
+		Date:   req.GetDate(),
+	}
+
+	resp, err := s.app.EventsMonth(ctx, requestDto)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "some error")
+	}
+
+	pbEvents := make([]*pb.Event, 0, len(resp.Events))
+	for _, ev := range resp.Events {
+		pbEvents = append(pbEvents, convertToPbEvent(ev))
+	}
+
+	return &pb.EventsDateResponse{
+		Events: pbEvents,
+	}, nil
+}
+
+func convertToPbEvent(e entity.Event) *pb.Event {
+	return &pb.Event{
+		Id:           e.ID,
+		UserId:       e.UserID,
+		Title:        e.Title,
+		Description:  e.Description,
+		TimeStart:    timestamppb.New(e.TimeStart),
+		TimeEnd:      timestamppb.New(e.TimeEnd),
+		NotifyBefore: durationpb.New(e.NotifyBefore),
+	}
 }
 
 func New(cfg config.ServerGrpcConf, logger logger.Logger, app application.Calendar) *Server {
