@@ -52,3 +52,45 @@ func (app *CalendarApp) UpdateEvent(ctx context.Context, req requestdto.UpdateEv
 
 	return nil
 }
+
+func (app *CalendarApp) EventsDay(ctx context.Context, req requestdto.EventsOnDate) (*responsedto.Events, error) {
+	useCase := usecase.NewEventsDayUseCase(app.st, app.logg)
+	events, err := useCase.Execute(ctx, &req)
+	if err != nil {
+		return nil, fmt.Errorf("calendar %w", err)
+	}
+
+	resp := responsedto.Events{
+		Events: events,
+	}
+
+	return &resp, nil
+}
+
+func (app *CalendarApp) EventsWeek(ctx context.Context, req requestdto.EventsOnDate) (*responsedto.Events, error) {
+	useCase := usecase.NewEventsWeekUseCase(app.st, app.logg)
+	events, err := useCase.Execute(ctx, &req)
+	if err != nil {
+		return nil, fmt.Errorf("calendar %w", err)
+	}
+
+	resp := responsedto.Events{
+		Events: events,
+	}
+
+	return &resp, nil
+}
+
+func (app *CalendarApp) EventsMonth(ctx context.Context, req requestdto.EventsOnDate) (*responsedto.Events, error) {
+	useCase := usecase.NewEventsMonthUseCase(app.st, app.logg)
+	events, err := useCase.Execute(ctx, &req)
+	if err != nil {
+		return nil, fmt.Errorf("calendar %w", err)
+	}
+
+	resp := responsedto.Events{
+		Events: events,
+	}
+
+	return &resp, nil
+}

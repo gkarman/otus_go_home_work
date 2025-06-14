@@ -8,7 +8,10 @@ import (
 )
 
 type Calendar interface {
-	CreateEvent(ctx context.Context, event requestdto.CreateEvent) (responsedto.CreateEvent, error)
-	DeleteEvent(ctx context.Context, event requestdto.DeleteEvent) error
-	UpdateEvent(ctx context.Context, event requestdto.UpdateEvent) error
+	CreateEvent(ctx context.Context, req requestdto.CreateEvent) (responsedto.CreateEvent, error)
+	DeleteEvent(ctx context.Context, req requestdto.DeleteEvent) error
+	UpdateEvent(ctx context.Context, req requestdto.UpdateEvent) error
+	EventsDay(ctx context.Context, req requestdto.EventsOnDate) (*responsedto.Events, error)
+	EventsWeek(ctx context.Context, req requestdto.EventsOnDate) (*responsedto.Events, error)
+	EventsMonth(ctx context.Context, req requestdto.EventsOnDate) (*responsedto.Events, error)
 }

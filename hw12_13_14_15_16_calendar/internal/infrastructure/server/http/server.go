@@ -76,6 +76,9 @@ func (s *Server) registerRoutes() *http.ServeMux {
 	mux.HandleFunc("/create", s.handleCreate())
 	mux.HandleFunc("/delete", s.handleDelete())
 	mux.HandleFunc("/update", s.handleUpdate())
+	mux.HandleFunc("/events_day", s.handleEventsDay())
+	mux.HandleFunc("/events_week", s.handleEventsWeek())
+	mux.HandleFunc("/events_month", s.handleEventsMonth())
 
 	return mux
 }
@@ -171,5 +174,92 @@ func (s *Server) handleUpdate() http.HandlerFunc {
 			Status:  true,
 			Message: "event updated",
 		})
+	}
+}
+
+//nolint:dupl
+func (s *Server) handleEventsDay() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		var requestDto requestdto.EventsOnDate
+		if err := json.NewDecoder(r.Body).Decode(&requestDto); err != nil {
+			http.Error(w, "invalid request body: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		ctx := r.Context()
+
+		resp, err := s.app.EventsDay(ctx, requestDto)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		if err := json.NewEncoder(w).Encode(resp); err != nil {
+			http.Error(w, "failed to encode response: "+err.Error(), http.StatusInternalServerError)
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+//nolint:dupl
+func (s *Server) handleEventsWeek() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		var requestDto requestdto.EventsOnDate
+		if err := json.NewDecoder(r.Body).Decode(&requestDto); err != nil {
+			http.Error(w, "invalid request body: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		ctx := r.Context()
+
+		resp, err := s.app.EventsWeek(ctx, requestDto)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		if err := json.NewEncoder(w).Encode(resp); err != nil {
+			http.Error(w, "failed to encode response: "+err.Error(), http.StatusInternalServerError)
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+//nolint:dupl
+func (s *Server) handleEventsMonth() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		var requestDto requestdto.EventsOnDate
+		if err := json.NewDecoder(r.Body).Decode(&requestDto); err != nil {
+			http.Error(w, "invalid request body: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		ctx := r.Context()
+
+		resp, err := s.app.EventsMonth(ctx, requestDto)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		if err := json.NewEncoder(w).Encode(resp); err != nil {
+			http.Error(w, "failed to encode response: "+err.Error(), http.StatusInternalServerError)
+		}
+		w.WriteHeader(http.StatusOK)
 	}
 }
