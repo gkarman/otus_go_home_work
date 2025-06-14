@@ -10,4 +10,5 @@ import (
 type Calendar interface {
 	CreateEvent(ctx context.Context, event requestdto.CreateEvent) (responsedto.CreateEvent, error)
 	DeleteEvent(ctx context.Context, event requestdto.DeleteEvent) error
+	UpdateEvent(ctx context.Context, event requestdto.UpdateEvent) error
 }

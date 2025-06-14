@@ -20,6 +20,7 @@ message Event {
 service EventService {
   rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
   rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse);
+  rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventResponse);
 }
 
 message CreateEventRequest {
@@ -41,6 +42,15 @@ message DeleteEventRequest {
 }
 
 message DeleteEventResponse {
+  bool status = 1;
+  string message = 2;
+}
+
+message UpdateEventRequest {
+    Event event = 1;
+}
+
+message UpdateEventResponse {
   bool status = 1;
   string message = 2;
 }

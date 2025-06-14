@@ -60,6 +60,28 @@ func (s *Server) DeleteEvent(ctx context.Context, req *pb.DeleteEventRequest) (*
 	}, nil
 }
 
+func (s *Server) UpdateEvent(ctx context.Context, req *pb.UpdateEventRequest) (*pb.UpdateEventResponse, error) {
+	requestDto := requestdto.UpdateEvent{
+		ID:           req.Event.GetId(),
+		UserID:       req.Event.GetUserId(),
+		Title:        req.Event.GetTitle(),
+		Description:  req.Event.GetDescription(),
+		TimeStart:    req.Event.GetTimeStart().AsTime(),
+		TimeEnd:      req.Event.GetTimeEnd().AsTime(),
+		NotifyBefore: req.Event.GetNotifyBefore().AsDuration(),
+	}
+
+	err := s.app.UpdateEvent(ctx, requestDto)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "some error")
+	}
+
+	return &pb.UpdateEventResponse{
+		Status:  true,
+		Message: "done",
+	}, nil
+}
+
 func New(cfg config.ServerGrpcConf, logger logger.Logger, app application.Calendar) *Server {
 	return &Server{
 		logger: logger,

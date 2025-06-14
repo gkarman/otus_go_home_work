@@ -75,6 +75,7 @@ func (s *Server) registerRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/create", s.handleCreate())
 	mux.HandleFunc("/delete", s.handleDelete())
+	mux.HandleFunc("/update", s.handleUpdate())
 
 	return mux
 }
@@ -105,6 +106,7 @@ func (s *Server) handleCreate() http.HandlerFunc {
 	}
 }
 
+//nolint:dupl // handleUpdate похож на handleDelete, но это ожидаемо
 func (s *Server) handleDelete() http.HandlerFunc {
 	type response struct {
 		Status  bool   `json:"status"`
@@ -134,6 +136,40 @@ func (s *Server) handleDelete() http.HandlerFunc {
 		json.NewEncoder(w).Encode(response{
 			Status:  true,
 			Message: "event deleted",
+		})
+	}
+}
+
+//nolint:dupl // handleUpdate похож на handleDelete, но это ожидаемо
+func (s *Server) handleUpdate() http.HandlerFunc {
+	type response struct {
+		Status  bool   `json:"status"`
+		Message string `json:"message"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		var requestDto requestdto.UpdateEvent
+		if err := json.NewDecoder(r.Body).Decode(&requestDto); err != nil {
+			http.Error(w, "invalid update request body: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		ctx := r.Context()
+		err := s.app.UpdateEvent(ctx, requestDto)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(response{
+			Status:  true,
+			Message: "event updated",
 		})
 	}
 }
