@@ -1,7 +1,9 @@
 package standartlogger
 
 import (
+	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 )
@@ -20,13 +22,25 @@ var levelMap = map[string]int{
 	"debug": LevelDebug,
 }
 
+var ErrFileNotOpened = errors.New("file is not opened")
+
 type Logger struct {
-	level int
+	level       int
+	httpLogFile *os.File
 }
 
-func New(level string) *Logger {
+func New(level string, pathToHTTPLog string) (*Logger, error) {
 	parsedLevel := parseLevel(level)
-	return &Logger{level: parsedLevel}
+
+	httpLogFile, err := os.OpenFile(pathToHTTPLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	if err != nil {
+		return nil, ErrFileNotOpened
+	}
+
+	return &Logger{
+		level:       parsedLevel,
+		httpLogFile: httpLogFile,
+	}, nil
 }
 
 func parseLevel(level string) int {
@@ -42,6 +56,10 @@ func (l *Logger) log(level int, prefix string, msg string) {
 	}
 	timestamp := time.Now().Format("2025-01-01 01:01:01")
 	fmt.Printf("[%s] [%s] %s\n", timestamp, prefix, msg)
+}
+
+func (l *Logger) LogToFile(msg string) {
+	_, _ = l.httpLogFile.WriteString(msg + "\n")
 }
 
 func (l *Logger) Info(msg string) {

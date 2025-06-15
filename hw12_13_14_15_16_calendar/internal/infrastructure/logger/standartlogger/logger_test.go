@@ -13,9 +13,12 @@ func TestLogger_Info_Output(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	logger := New("info")
-	logger.Info("Привет, лог!")
+	logger, err := New("info", "http_test.log")
+	if err != nil {
+		t.Errorf("Ошибка создания логгера: %v", err)
+	}
 
+	logger.Info("Привет, лог!")
 	w.Close()
 	var buf bytes.Buffer
 	io.Copy(&buf, r)

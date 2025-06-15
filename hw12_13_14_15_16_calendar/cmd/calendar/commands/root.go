@@ -6,11 +6,14 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
+	"time"
 
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/app"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/config"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/logger"
+	internalgrpc "github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/server/grpc"
 	internalhttp "github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/server/http"
 	"github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/internal/infrastructure/storage"
 	"github.com/spf13/cobra"
@@ -45,23 +48,62 @@ func Execute() {
 }
 
 func runCalendar() {
-	logg := logger.New(cfg.Logger)
+	logg, err := logger.New(cfg.Logger)
+	if err != nil {
+		os.Exit(1)
+	}
+
 	st, err := storage.New(cfg.Storage)
 	if err != nil {
 		logg.Error("failed to init storage: " + err.Error())
 		os.Exit(1)
 	}
-	calendar := app.New(logg, st)
-	server := internalhttp.New(cfg.Server, logg, calendar)
+	calendarApp := app.NewCalendarApp(logg, st)
+	server := internalhttp.New(cfg.Server, logg, calendarApp)
+	serverGrpc := internalgrpc.New(cfg.ServerGrpc, logg, calendarApp)
 
-	ctx, cancel := signal.NotifyContext(context.Background(),
-		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
-	defer cancel()
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	defer stop()
 
 	logg.Info("calendar is running...")
 
-	if err := server.Start(ctx); err != nil {
-		logg.Error("failed to start http server: " + err.Error())
-		cancel()
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	// HTTP server
+	go func() {
+		defer wg.Done()
+		if err := server.Start(ctx); err != nil {
+			logg.Error("http server error: " + err.Error())
+			stop()
+		}
+	}()
+
+	// gRPC server
+	go func() {
+		defer wg.Done()
+		if err := serverGrpc.Start(ctx); err != nil {
+			logg.Error("grpc server error: " + err.Error())
+			stop()
+		}
+	}()
+
+	// Ожидаем завершения работы по сигналу
+	<-ctx.Done()
+	logg.Info("shutting down...")
+
+	// Контекст с таймаутом для graceful shutdown
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Stop(shutdownCtx); err != nil {
+		logg.Error("http shutdown error: " + err.Error())
 	}
+
+	if err := serverGrpc.Stop(shutdownCtx); err != nil {
+		logg.Error("grpc shutdown error: " + err.Error())
+	}
+
+	wg.Wait()
+	logg.Info("calendar stopped")
 }

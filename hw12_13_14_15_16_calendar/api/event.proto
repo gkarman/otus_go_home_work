@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package event;
+
+option go_package = "github.com/gkarman/otus_go_home_work/hw12_13_14_15_calendar/api/pb;pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+message Event {
+  string id = 1;
+  string user_id = 2;
+  string title = 3;
+  string description = 4;
+  google.protobuf.Timestamp time_start = 5;
+  google.protobuf.Timestamp time_end = 6;
+  google.protobuf.Duration notify_before = 7;
+}
+
+service EventService {
+  rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
+  rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse);
+  rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventResponse);
+  rpc EventsDay(EventsDateRequest) returns (EventsDateResponse);
+  rpc EventsWeek(EventsDateRequest) returns (EventsDateResponse);
+  rpc EventsMonth(EventsDateRequest) returns (EventsDateResponse);
+}
+
+message CreateEventRequest {
+  string user_id = 1;
+  string title = 2;
+  string description = 3;
+  google.protobuf.Timestamp start_time = 4;
+  google.protobuf.Timestamp end_time = 5;
+  google.protobuf.Duration notify_before = 6;
+}
+
+message CreateEventResponse {
+  string id = 1;
+}
+
+message DeleteEventRequest {
+  string id = 1;
+  string user_id = 2;
+}
+
+message DeleteEventResponse {
+  bool status = 1;
+  string message = 2;
+}
+
+message UpdateEventRequest {
+    Event event = 1;
+}
+
+message UpdateEventResponse {
+  bool status = 1;
+  string message = 2;
+}
+
+message EventsDateRequest {
+  string user_id = 1;
+  string date = 2;
+}
+
+message EventsDateResponse {
+  repeated Event events = 1;
+}

@@ -101,7 +101,8 @@ func (s *Storage) ListEvents(ctx context.Context, userID string, from, to time.T
 	var events []entity.Event
 
 	query := `
-		SELECT id, title, time_start, time_end, description, user_id, notify_before
+		SELECT id, title, time_start, time_end, description, user_id,
+		    EXTRACT(EPOCH FROM notify_before)::bigint AS notify_before
 		FROM events
 		WHERE user_id = $1 AND time_start >= $2 AND time_start <= $3
 	`
@@ -112,4 +113,22 @@ func (s *Storage) ListEvents(ctx context.Context, userID string, from, to time.T
 	}
 
 	return events, nil
+}
+
+func (s *Storage) GetEvent(ctx context.Context, id, userID string) (entity.Event, error) {
+	var event entity.Event
+
+	query := `
+		SELECT id, title, time_start, time_end, description, user_id,
+		       EXTRACT(EPOCH FROM notify_before)::bigint AS notify_before
+		FROM events
+		WHERE id = $1 AND user_id = $2
+	`
+
+	err := s.db.GetContext(ctx, &event, query, id, userID)
+	if err != nil {
+		return entity.Event{}, fmt.Errorf("get event: %w", err)
+	}
+
+	return event, nil
 }

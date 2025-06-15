@@ -3,11 +3,11 @@ package entity
 import "time"
 
 type Event struct {
-	ID           string
-	UserID       string
-	Title        string
-	TimeStart    time.Time
-	TimeEnd      time.Time
-	Description  string
-	NotifyBefore time.Duration
+	ID           string        `db:"id"`
+	UserID       string        `db:"user_id"`
+	Title        string        `db:"title"`
+	Description  string        `db:"description"`
+	TimeStart    time.Time     `db:"time_start"`
+	TimeEnd      time.Time     `db:"time_end"`
+	NotifyBefore time.Duration `db:"notify_before"`
 }

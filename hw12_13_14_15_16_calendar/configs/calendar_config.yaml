@@ -1,5 +1,6 @@
 storage:
-  type: "memory" # или "sql"
+  #type: "memory" # или "sql"
+  type: "sql"
   host: "localhost"
   port: 5432
   db: "calendar"
@@ -8,7 +9,12 @@ storage:
 
 logger:
   level: "INFO"
+  pathToHttpLog: "logs/http.log"
 
 server:
   host: "localhost"
   port: 8080
+
+serverGrpc:
+  host: "localhost"
+  port: 50051

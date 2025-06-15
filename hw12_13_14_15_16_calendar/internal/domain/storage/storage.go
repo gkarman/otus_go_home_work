@@ -12,4 +12,5 @@ type Storage interface {
 	UpdateEvent(ctx context.Context, event entity.Event) error
 	DeleteEvent(ctx context.Context, eventID string) error
 	ListEvents(ctx context.Context, userID string, from time.Time, to time.Time) ([]entity.Event, error)
+	GetEvent(ctx context.Context, userID, eventID string) (entity.Event, error)
 }
