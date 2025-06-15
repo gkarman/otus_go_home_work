@@ -13,7 +13,7 @@ func TestLogger_Info_Output(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	logger, err := New("info", "logs/http.log")
+	logger, err := New("info", "http_test.log")
 	if err != nil {
 		t.Errorf("Ошибка создания логгера: %v", err)
 	}
