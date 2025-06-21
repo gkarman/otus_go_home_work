@@ -1,0 +1,31 @@
+storage:
+  #type: "memory" # или "sql"
+  type: "sql"
+  host: "localhost"
+  port: 5432
+  db: "calendar"
+  user: "user"
+  password: "pass"
+
+logger:
+  level: "INFO"
+  pathToHttpLog: "logs/http.log"
+
+server:
+  host: "localhost"
+  port: 8080
+
+serverGrpc:
+  host: "localhost"
+  port: 50051
+
+broker:
+  type: rabbitmq
+  host: rabbitmq
+  port: 5672
+  virtual_host: /
+  username: user
+  password: pass
+  queue: calendar_events
+  exchange: calendar_exchange
+  routing_key: calendar.routing.key

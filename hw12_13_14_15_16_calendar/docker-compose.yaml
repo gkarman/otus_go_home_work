@@ -12,5 +12,18 @@ services:
     ports:
       - "5432:5432"
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"       # основной AMQP порт
+      - "15672:15672"     # веб-интерфейс RabbitMQ
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: pass
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+
 volumes:
   calendar_pgdata:
+  rabbitmq_data:

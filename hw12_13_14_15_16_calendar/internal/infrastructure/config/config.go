@@ -17,6 +17,7 @@ type Config struct {
 	Storage    StorageConf    `yaml:"storage"`
 	Server     ServerConf     `yaml:"server"`
 	ServerGrpc ServerGrpcConf `yaml:"serverGrpc"`
+	Broker     *BrokerConf    `yaml:"broker,omitempty"`
 }
 
 type LoggerConf struct {
@@ -41,6 +42,18 @@ type ServerConf struct {
 type ServerGrpcConf struct {
 	Host string `yaml:"host"`
 	Port string `yaml:"port"`
+}
+
+type BrokerConf struct {
+	Type        string `yaml:"type"`
+	Host        string `yaml:"host"`
+	Port        int    `yaml:"port"`
+	VirtualHost string `yaml:"virtual_host"`
+	Username    string `yaml:"username"`
+	Password    string `yaml:"password"`
+	Queue       string `yaml:"queue"`
+	Exchange    string `yaml:"exchange"`
+	RoutingKey  string `yaml:"routing_key"`
 }
 
 func Load(f string) (*Config, error) {
